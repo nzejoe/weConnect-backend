@@ -56,8 +56,8 @@ class Account(AbstractBaseUser):
         editable=False,
     )
     username = models.CharField(max_length=50, unique=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, null=True, blank=True)
     email = models.EmailField(unique=True)
     gender = models.CharField(max_length=10, choices=GENDER)
     avatar = ProcessedImageField(

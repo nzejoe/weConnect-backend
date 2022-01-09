@@ -1,0 +1,12 @@
+{% load i18n %}
+
+{% autoescape off %}
+    {% blocktrans %}
+        Hi {{ username }},
+        Please click the link below to activate your user account.
+    {% endblocktrans %}
+    {{ site_domain }}
+    {% blocktrans %}
+        If this is not you, please ignore this email.
+    {% endblocktrans %}
+{% endautoescape %}

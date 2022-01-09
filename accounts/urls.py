@@ -8,6 +8,8 @@ from . import views
 urlpatterns = [
     path('', views.UserList.as_view(), name='users_list'),
     path('user_detail/', views.LoggedInUser.as_view(), name='user_detail'),
+    path('register/', views.UserRegister.as_view(), name='register'),
+    path('activate_user/<uidb64>/<token>/', views.UserActivation.as_view(), name='activate_user'),
 ]
 
 
