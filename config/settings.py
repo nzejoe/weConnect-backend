@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # 3RD PARTY APPS
     'rest_framework',
     'corsheaders',
+    'imagekit',
     # oauth2
     'oauth2_provider',
     'social_django',
@@ -145,6 +146,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# media files
+MEDIA_URL = 'media/'
+
+MEDIA_ROOT = BASE_DIR.joinpath('media')
 
 
 # change user authentication model to the custom model we created

@@ -4,6 +4,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from imagekit.models import ImageSpecField, ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 
 class AccountManager(BaseUserManager):
@@ -44,6 +46,10 @@ class AccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser):
+    GENDER = (
+        ('female', 'Female'),
+        ('male', 'Male'),
+    )
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
@@ -53,7 +59,12 @@ class Account(AbstractBaseUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
-    gender = models.CharField(max_length=10)
+    gender = models.CharField(max_length=10, choices=GENDER)
+    avatar = ProcessedImageField(
+        upload_to='users/', processors=[ResizeToFill(500, 500), ], format='JPEG', options={'quality': 60}, null=True, blank=True)
+    # create thumbnail from avatar
+    thumb = ImageSpecField(source='avatar', processors=[ResizeToFill(
+        100, 100), ],  format='JPEG', options={'quality': 60})
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=False)

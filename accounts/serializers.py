@@ -7,5 +7,5 @@ class AccountSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Account
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'gender']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'gender', 'avatar']
         # exclude = ['password', ]
