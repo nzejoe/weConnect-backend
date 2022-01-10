@@ -7,7 +7,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.core.mail import EmailMessage
 
-from rest_framework import permissions, status
+from rest_framework import permissions, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,6 +17,7 @@ from .serializers import (
     UserRegisterSerializer, 
     PasswordResetSerializer,
     PasswordResetCompleteSerializer,
+    PasswordChangeSerializer,
 )
 
 
@@ -198,3 +199,19 @@ class PasswordResetComplete(APIView):
         # this will be returned if no user  
         return Response({'error': 'invalid link'}, status=status.HTTP_404_NOT_FOUND)
 
+
+class PasswordChange(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def post(self, request):
+        serializer = PasswordChangeSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = Account.object.get(pk=request.user.id)
+            current_password = serializer.validated_data.get('current_password')
+            password = serializer.validated_data.get('password')
+            # check if current password is correct
+            if not user.check_password(current_password):
+                raise serializers.ValidationError({'current_password':'current password is incorrect!'})
+            user.set_password(password)
+            user.save()
+        return Response({'password_changed': True})

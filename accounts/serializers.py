@@ -53,3 +53,18 @@ class PasswordResetCompleteSerializer(serializers.Serializer):
         if password != password2:
             raise serializers.ValidationError({'error': 'the two password did not match!'})
         return super().validate(attrs)
+    
+    
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(max_length=30)
+    password = serializers.CharField(max_length=30)
+    password2 = serializers.CharField(max_length=30)
+    
+    def validate(self, attrs):
+        password = attrs['password']
+        password2 = attrs['password2']
+        
+        # check if current password is correct
+        if password != password2:
+            raise serializers.ValidationError({'error': 'the new password did not match!'})
+        return super().validate(attrs)
