@@ -40,3 +40,16 @@ class PasswordResetSerializer(serializers.Serializer):
             raise serializers.ValidationError(f'{value} is not associated with any account!')
         
         return value
+
+
+class PasswordResetCompleteSerializer(serializers.Serializer):
+    password = serializers.CharField(max_length=30)
+    password2 = serializers.CharField(max_length=30)
+    
+    def validate(self, attrs):
+        password = attrs['password']
+        password2 = attrs['password2']
+        
+        if password != password2:
+            raise serializers.ValidationError({'error': 'the two password did not match!'})
+        return super().validate(attrs)

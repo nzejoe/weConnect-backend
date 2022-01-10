@@ -12,7 +12,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Account
-from .serializers import AccountSerializer, UserRegisterSerializer, PasswordResetSerializer
+from .serializers import (
+    AccountSerializer, 
+    UserRegisterSerializer, 
+    PasswordResetSerializer,
+    PasswordResetCompleteSerializer,
+)
 
 
 class UserList(APIView):
@@ -136,7 +141,7 @@ class PasswordReset(APIView):
             emai_message.send()
             # save link validity check to session storage and set active
             request.session['password_reset_link_valid'] = True
-            return Response({'reset_done': f'{verification_url}'})
+            return Response({'reset_done': True})
         else:
             return Response(serializer.errors)
 
@@ -157,9 +162,39 @@ class PasswordResetVerification(APIView):
         if request.session['password_reset_link_valid'] and user is not None and default_token_generator.check_token(user, token):
             status_res = status.HTTP_200_OK
             data['link_valid'] = True
-            # save user id in session storage so we can use id in PasswordResetComplete view
-            request.session['user'] = user.id
+            # save user id in session storage so we can use to verify in PasswordResetComplete view
+            request.session['user'] = user.username
         else:
             status_res = status.HTTP_404_NOT_FOUND
             data['link_valid'] = False
         return Response(data, status=status_res)
+
+
+class PasswordResetComplete(APIView):
+    permission_classes = [permissions.AllowAny, ]
+    
+    def post(self, request):
+        
+        serializer = PasswordResetCompleteSerializer(data=request.data)
+        user = None
+        # check if user is stored in session storage
+        try:
+            username = request.session['user'] # this will raise KeyError exception if user not in session storage
+            user = Account.object.get(username=username)
+            if serializer.is_valid(raise_exception=True):
+                password = serializer.validated_data.get('password')
+        except (AttributeError, KeyError):
+             user = None
+        
+        if user is not None:
+            # set user password
+            user.set_password(password)
+            user.save()
+            request.session['password_reset_link_valid'] = False
+            # remove user from session storage
+            del request.session['user']
+            return Response({'reset_complete': True}) 
+        
+        # this will be returned if no user  
+        return Response({'error': 'invalid link'}, status=status.HTTP_404_NOT_FOUND)
+
