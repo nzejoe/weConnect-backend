@@ -29,3 +29,14 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'error': 'the two password did not match!'})
         
         return super().validate(attrs)
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
+    def validate_email(self, value):
+        
+        if not Account.object.filter(email=value.lower()).exists():
+            raise serializers.ValidationError(f'{value} is not associated with any account!')
+        
+        return value

@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Account
-from .serializers import AccountSerializer, UserRegisterSerializer
+from .serializers import AccountSerializer, UserRegisterSerializer, PasswordResetSerializer
 
 
 class UserList(APIView):
@@ -75,10 +75,8 @@ class UserRegister(APIView):
                 'username': user.username
             }
             email_subject = "User account activation"
-            message = render_to_string(
-                'accounts/user_activation_email.html', context)
-            emai_message = EmailMessage(
-                email_subject, message, to=[user.email, ])
+            message = render_to_string('accounts/user_activation_email.html', context)
+            emai_message = EmailMessage(email_subject, message, to=[user.email, ])
             emai_message.send()
             # save link validity check to session storage and set active
             request.session['link_active'] = True
@@ -110,4 +108,58 @@ class UserActivation(APIView):
             status_res = status.HTTP_404_NOT_FOUND
             data['account_activated'] = False
             data['error_msg'] = "invalid link or expired!"
+        return Response(data, status=status_res)
+
+
+class PasswordReset(APIView):
+    permission_classes = [permissions.AllowAny, ]
+    
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            email = serializer.validated_data.get('email')
+            user = Account.object.get(email=email)
+            # create a uidb64 from user id
+            uid = urlsafe_base64_encode(force_bytes(user.id))
+            token = default_token_generator.make_token(user=user)
+            current_site = request.META.get('HTTP_ORIGIN') or get_current_site(request)
+            verification_url = f'{current_site}/users/password_reset_verification/{uid}/{token}/'
+            
+            # create email message
+            context = {
+                "site_domain": verification_url,
+                'username': user.username
+            }
+            email_subject = "User account activation"
+            message = render_to_string('accounts/password_reset_email.html', context)
+            emai_message = EmailMessage(email_subject, message, to=[email, ])
+            emai_message.send()
+            # save link validity check to session storage and set active
+            request.session['password_reset_link_valid'] = True
+            return Response({'reset_done': f'{verification_url}'})
+        else:
+            return Response(serializer.errors)
+
+
+class PasswordResetVerification(APIView):
+    permission_classes = [permissions.AllowAny, ]
+
+    def post(self, request, uidb64, token):
+        
+        data = {}
+        
+        try:
+            user_id = urlsafe_base64_decode(uidb64).decode()
+            user = Account.object.get(pk=user_id)
+        except(ValueError, ValidationError, TypeError, Account.DoesNotExist):
+            user = None
+            
+        if request.session['password_reset_link_valid'] and user is not None and default_token_generator.check_token(user, token):
+            status_res = status.HTTP_200_OK
+            data['link_valid'] = True
+            # save user id in session storage so we can use id in PasswordResetComplete view
+            request.session['user'] = user.id
+        else:
+            status_res = status.HTTP_404_NOT_FOUND
+            data['link_valid'] = False
         return Response(data, status=status_res)
