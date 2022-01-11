@@ -12,3 +12,10 @@ class PostSerializer(serializers.ModelSerializer):
                 'read_only': True,
             },
         }
+        
+    def update(self, instance, validated_data):
+        instance.text = validated_data.get('text', instance.text)
+        instance.image = validated_data.get('image', instance.image) 
+        instance.user = validated_data.get('user', instance.user) 
+        instance.like_count = validated_data.get('user', instance.like_count) 
+        return super().update(instance, validated_data)

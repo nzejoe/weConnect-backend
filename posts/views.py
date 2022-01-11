@@ -29,3 +29,16 @@ class PostCreate(APIView):
             return Response({'user': request.user.id, **serializer.data})
         else:
             return Response(serializer.errors)
+
+
+class PostUpdate(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    
+    def put(self, request, pk):
+        # get the post we want to update
+        post = Post.objects.get(id=pk)
+        serializer = PostSerializer(post, request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
