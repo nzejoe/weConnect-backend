@@ -35,7 +35,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField(max_length=500)
     created = models.DateTimeField(auto_now_add=True)
@@ -49,11 +49,12 @@ class Comment(models.Model):
         
         
 class Reply(models.Model):
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name="replies")
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField(max_length=500)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    
     
     class Meta:
         verbose_name = 'reply'

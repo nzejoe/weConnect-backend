@@ -1,9 +1,22 @@
 from rest_framework import serializers
 
-from .models import Post
+from .models import Post, Comment, Reply
+
+
+class ReplySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reply
+        fields = '__all__'
+        
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
 
 
 class PostSerializer(serializers.ModelSerializer):
+    comments = CommentSerializer(many=True, read_only=True)
     class Meta:
         model = Post
         fields = '__all__'
@@ -19,3 +32,4 @@ class PostSerializer(serializers.ModelSerializer):
         instance.author = validated_data.get('author', instance.author) 
         instance.like_count = validated_data.get('like_count', instance.like_count) 
         return super().update(instance, validated_data)
+        
