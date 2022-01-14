@@ -18,6 +18,9 @@ class CommentSerializer(serializers.ModelSerializer):
             'author': {
                 'read_only': True,
             },
+            'post': {
+                'read_only': True,
+            },
         }
 
 

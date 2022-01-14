@@ -79,3 +79,24 @@ class CommentList(APIView):
         comment_list = Comment.objects.filter(post_id=pk)
         serializer = CommentSerializer(comment_list, many=True)
         return Response(serializer.data)
+    
+    def post(self, request, pk):
+        serializer = CommentSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid(raise_exception=True):
+            # get the post we want to update
+            try:
+                post = Post.objects.get(id=pk)
+            except Post.DoesNotExist:
+                return Response({'error': 'post you are looking for does not exist!'}, status=status.HTTP_404_NOT_FOUND)
+
+            # create comment
+            comment = Comment.objects.create(
+                post=post,
+                author=request.user,
+                text=serializer.validated_data.get('text')
+            )
+            comment.save()
+            
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
