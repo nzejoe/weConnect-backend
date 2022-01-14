@@ -100,3 +100,45 @@ class CommentList(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+        
+
+class CommentDetail(APIView):
+    permission_classes = (IsOwnerOrReadOnly, )
+
+    def get(self, request, pk):
+        try:
+            comment = Comment.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({'error': 'comment you are looking for does not exist!'}, status=status.HTTP_404_NOT_FOUND)
+        # check if user has permission for this request
+        self.check_object_permissions(request, comment)
+        serializer = CommentSerializer(comment, context={'request': request})
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        # get the post we want to update
+        try:
+            comment = Comment.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({'error': 'comment you are looking for does not exist!'}, status=status.HTTP_404_NOT_FOUND)
+        # check if user has permission for this request
+        self.check_object_permissions(request, comment)
+        serializer = CommentSerializer(comment, request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+    def delete(self, request, pk):
+        # get the post we want to delete
+        try:
+            comment = Comment.objects.get(id=pk)
+        except(Comment.DoesNotExist, ):
+            # if no post matches the pk
+            # return error response
+            return Response({'error': "comment does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        # delete post
+        comment.delete()
+        # check if user has permission for this request
+        self.check_object_permissions(request, comment)
+        return Response({"deleted": True})
