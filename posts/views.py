@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-# from rest_framework import permissions
+from rest_framework import permissions
 
 from .serializers import PostSerializer
 from .models import Post
@@ -11,7 +11,7 @@ from .permissions import IsOwnerOrReadOnly
 
 
 class PostList(APIView):
-    # permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated, ]
     
     def get(self, request):
         post_list = Post.objects.all()
@@ -34,7 +34,10 @@ class PostDetail(APIView):
     permission_classes = (IsOwnerOrReadOnly, )
     
     def get(self, request, pk):
-        post = Post.objects.get(id=pk)
+        try:
+            post = Post.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({'error': 'post you are looking for does not exist!'}, status=status.HTTP_404_NOT_FOUND)
         # check if user has permission for this request
         self.check_object_permissions(request, post)
         serializer = PostSerializer(post, context={'request': request})
@@ -42,7 +45,10 @@ class PostDetail(APIView):
     
     def put(self, request, pk):
         # get the post we want to update
-        post = Post.objects.get(id=pk)
+        try:
+            post = Post.objects.get(id=pk)
+        except Post.DoesNotExist:
+            return Response({'error': 'post you are looking for does not exist!'}, status=status.HTTP_404_NOT_FOUND)
         # check if user has permission for this request
         self.check_object_permissions(request, post)
         serializer = PostSerializer(post, request.data)
