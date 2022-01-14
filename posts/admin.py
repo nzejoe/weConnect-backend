@@ -6,7 +6,7 @@ from .models import Post, Comment, Reply
 class CommentInline(admin.TabularInline):
     model = Comment
     extra = 0
-    readonly_fields = ['text', 'author', 'created', 'updated']
+    # readonly_fields = ['text', 'author', 'created', 'updated']
 
 class PostAdmin(admin.ModelAdmin):
     model = Post

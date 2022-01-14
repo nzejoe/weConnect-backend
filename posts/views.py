@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import permissions
 
-from .serializers import PostSerializer
-from .models import Post
+from .serializers import PostSerializer,CommentSerializer, ReplySerializer
+from .models import Post, Comment, Reply
 from .permissions import IsOwnerOrReadOnly
 
 
@@ -70,3 +70,12 @@ class PostDetail(APIView):
         # check if user has permission for this request
         self.check_object_permissions(request, post)
         return Response({"deleted": True})
+
+
+class CommentList(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    
+    def get(self, request, pk):
+        comment_list = Comment.objects.filter(post_id=pk)
+        serializer = CommentSerializer(comment_list, many=True)
+        return Response(serializer.data)

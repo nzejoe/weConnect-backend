@@ -10,9 +10,15 @@ class ReplySerializer(serializers.ModelSerializer):
         
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Comment
         fields = '__all__'
+        extra_kwargs = {
+            'author': {
+                'read_only': True,
+            },
+        }
 
 
 class PostSerializer(serializers.ModelSerializer):
