@@ -16,7 +16,7 @@ class Post(models.Model):
         default=uuid.uuid4,
         editable=False
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField(max_length=500)
     image = ProcessedImageField(
         upload_to='posts/', processors=[ResizeToFill(500, 500), ], format='JPEG', options={'quality': 60}, null=True, blank=True)
@@ -28,5 +28,40 @@ class Post(models.Model):
     updated = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return str(self.created)
+        if len(self.text) > 20:
+            return str(f'{self.text[:50]}...')
+        else:
+            return self.text
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(max_length=500)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        if len(self.text) > 50:
+            return str(f'{self.text[:50]}...')
+        else:
+            return self.text
+        
+        
+class Reply(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(max_length=500)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'reply'
+        verbose_name_plural = 'replies'
+    
+    def __str__(self):
+        if len(self.text) > 50:
+            return str(f'{self.text[:50]}...')
+        else:
+            return self.text
     

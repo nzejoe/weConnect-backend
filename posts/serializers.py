@@ -16,6 +16,6 @@ class PostSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.text = validated_data.get('text', instance.text)
         instance.image = validated_data.get('image', instance.image) 
-        instance.user = validated_data.get('user', instance.user) 
-        instance.like_count = validated_data.get('user', instance.like_count) 
+        instance.author = validated_data.get('author', instance.author) 
+        instance.like_count = validated_data.get('like_count', instance.like_count) 
         return super().update(instance, validated_data)

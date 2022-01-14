@@ -10,4 +10,4 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
         # if PUT or DELETE request
         # this will return true if the user is the owner of the post or false otherwise
-        return request.user == obj.user
+        return request.user == obj.author

@@ -21,10 +21,10 @@ class PostList(APIView):
     def post(self, request):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
-            data = {'user': request.user, **serializer.data}
+            data = {'author': request.user, **serializer.data}
             post = Post.objects.create(**data)
             post.save()
-            return Response({'user': request.user.id, **serializer.data})
+            return Response({'author': request.user.id, **serializer.data})
         else:
             return Response(serializer.errors)
 
@@ -64,6 +64,3 @@ class PostDetail(APIView):
         # check if user has permission for this request
         self.check_object_permissions(request, post)
         return Response({"deleted": True})
-
-
-    
