@@ -4,13 +4,20 @@ from .models import Post, Comment, Reply
 
 
 class ReplySerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
     class Meta:
         model = Reply
         fields = '__all__'
+        extra_kwargs = {
+            'comment': {
+                'read_only': True,
+            },
+        }
         
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
+    replies = ReplySerializer(many=True, read_only=True)
     class Meta:
         model = Comment
         fields = '__all__'
