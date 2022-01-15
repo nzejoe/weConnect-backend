@@ -138,10 +138,10 @@ class CommentDetail(APIView):
             # if no post matches the pk
             # return error response
             return Response({'error': "comment does not exist!"}, status=status.HTTP_404_NOT_FOUND)
-        # delete post
-        comment.delete()
         # check if user has permission for this request
         self.check_object_permissions(request, comment)
+        # delete post
+        comment.delete()
         return Response({"deleted": True})
 
 
@@ -170,6 +170,16 @@ class ReplyList(APIView):
     
 
 class ReplyDetail(APIView):
-    pass
-
+    permission_classes = (IsOwnerOrReadOnly, )
+    
+    def get(self, request, pk):
+        try:
+            reply = Reply.objects.get(pk=pk)
+        except (Reply.DoesNotExist, ):
+            return Response({'error': "reply does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        # check if user has permission for this request
+        self.check_object_permissions(request, reply)
+        serializer = ReplySerializer(reply)
+        return Response(serializer.data)
+        
 
