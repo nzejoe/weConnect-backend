@@ -13,6 +13,13 @@ class ReplySerializer(serializers.ModelSerializer):
                 'read_only': True,
             },
         }
+    
+    def update(self, instance, validated_data):
+        instance.author = validated_data.get('author', instance.author)
+        instance.comment = validated_data.get('comment', instance.comment)
+        instance.text = validated_data.get('text', instance.text)
+        
+        return super().update(instance, validated_data)
         
 
 class CommentSerializer(serializers.ModelSerializer):

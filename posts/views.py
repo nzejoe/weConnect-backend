@@ -181,5 +181,17 @@ class ReplyDetail(APIView):
         self.check_object_permissions(request, reply)
         serializer = ReplySerializer(reply)
         return Response(serializer.data)
-        
-
+    
+    def put(self, request, pk):
+        try:
+            reply = Reply.objects.get(pk=pk)
+        except (Reply.DoesNotExist, ):
+            return Response({'error': "reply does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        # check if user has permission for this request
+        self.check_object_permissions(request, reply)
+        serializer = ReplySerializer(reply, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        # if errors
+        return Response(serializer.errors)
