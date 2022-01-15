@@ -195,3 +195,15 @@ class ReplyDetail(APIView):
             return Response(serializer.data)
         # if errors
         return Response(serializer.errors)
+    
+    def delete(self, request, pk):
+        try:
+            reply = Reply.objects.get(pk=pk)
+        except (Reply.DoesNotExist, ):
+            return Response({'error': "reply does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        # check if user has permission for this request
+        self.check_object_permissions(request, reply)
+        # delete reply
+        reply.delete()
+        # if errors
+        return Response({"deleted": True})
