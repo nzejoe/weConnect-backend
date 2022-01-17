@@ -44,6 +44,18 @@ class LoggedInUser(APIView):
         return Response(serializer.data)
 
 
+class UserDetail(APIView):
+    ''' this view will return the details any user '''
+    # user must be authenticated in order to access this view
+    permission_classes = [permissions.IsAuthenticated, ]
+
+    def get(self, request, pk):
+        user = Account.object.get(pk=pk)
+        serializer = AccountSerializer(user)
+
+        return Response(serializer.data)
+
+
 class UserRegister(APIView):
     permission_classes = [permissions.AllowAny, ]
 
