@@ -13,7 +13,8 @@ from rest_framework.views import APIView
 
 from .models import Account, UserFollower
 from .serializers import (
-    AccountSerializer, 
+    AccountSerializer,
+    FollowersSerializer, 
     UserRegisterSerializer, 
     PasswordResetSerializer,
     PasswordResetCompleteSerializer,
@@ -240,4 +241,16 @@ class FollowUser(APIView):
         # check if this request user already following
         if UserFollower.objects.filter():
             pass
+
+
+class UserFollowing(APIView):
+    # this view will return list of user any user is following
+    permission_classes = [permissions.IsAuthenticated, ]
     
+    def get(self, request, pk):
+        # if request is made by logged in user
+        user = Account.object.get(pk=pk)
+        users_following = UserFollower.objects.filter(follower=user)
+        serializer = FollowersSerializer(users_following, many=True)
+        return Response(serializer.data)
+            

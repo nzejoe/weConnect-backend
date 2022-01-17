@@ -28,7 +28,7 @@ class AccountAdmin(UserAdmin):
 
 class FollowersAdmin(admin.ModelAdmin):
     model = UserFollower
-    list_display = ['user', 'follower', 'created'] 
+    list_display = ['following', 'follower', 'created']
 
 
 admin.site.register(User, AccountAdmin)

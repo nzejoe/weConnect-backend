@@ -3,8 +3,17 @@ from rest_framework import serializers
 from .models import Account, UserFollower
 
 
+class FollowingSerializer(serializers.ModelSerializer):
+    # this will serialize following user 
+    class Meta:
+        model = Account
+        fields = ['id', 'username', 'first_name', 'last_name',
+                  'email', 'gender', 'avatar', 'followers']
+
+
 class FollowersSerializer(serializers.ModelSerializer):
     follower = serializers.StringRelatedField()
+    following = FollowingSerializer()
     class Meta:
         model = UserFollower
         fields = '__all__'
