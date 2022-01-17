@@ -227,3 +227,20 @@ class PostLike(APIView):
             like.save()
             return Response({'liked': True})
         
+        
+class PostUnlike(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    
+    def delete(self, request, pk):
+        # get the post been liked
+        post = Post.objects.get(pk=pk)
+        # check if this user liked this post
+        if not Like.objects.filter(user=request.user, post=post).exists():
+            return Response({'error':  'You need to like this post first!'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            # delete user like for this post
+            like = Like.objects.filter(user=request.user, post=post)
+            like.delete()
+            
+            return Response({'unliked': True})
+        
