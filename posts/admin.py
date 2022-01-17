@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Post, Comment, Reply
+from .models import Post, Comment, Reply, Like
 
 
 class CommentInline(admin.TabularInline):
@@ -8,10 +8,16 @@ class CommentInline(admin.TabularInline):
     extra = 0
     # readonly_fields = ['text', 'author', 'created', 'updated']
 
+
+class LikeInline(admin.StackedInline):
+    model = Like
+    extra = 0
+    
+    
 class PostAdmin(admin.ModelAdmin):
     model = Post
     list_display = ['text', 'author', 'created', 'updated']
-    inlines = [CommentInline, ]
+    inlines = [CommentInline, LikeInline]
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment)

@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework import permissions
 
 from .serializers import PostSerializer, CommentSerializer, ReplySerializer
-from .models import Post, Comment, Reply
+from .models import Post, Comment, Reply, Like, User
 from .permissions import IsOwnerOrReadOnly
 
 
@@ -210,4 +210,20 @@ class ReplyDetail(APIView):
 
 
 class PostLike(APIView):
-    pass
+    permission_classes = [permissions.IsAuthenticated, ]
+    
+    def post(self, request, pk):
+        # get the post been liked
+        post = Post.objects.get(pk=pk)
+        # check if this post has already been liked by this user
+        if Like.objects.filter(user=request.user, post=post).exists():
+            return Response({'error':  'this post already been liked by you!'}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            # create a like for this post
+            like = Like(
+                post=post,
+                user=request.user,
+            )
+            like.save()
+            return Response({'liked': True})
+        
