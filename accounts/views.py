@@ -259,4 +259,25 @@ class FollowUser(APIView):
             )
             user_follow.save()
             return Response({'followed': True})
+        
+    # unfollow user    
+    def delete(self, request, pk):
+        # check if pk is valid
+        try:
+            # get the user this request user wants to follow
+            following = Account.object.get(pk=pk)
+        except Account.DoesNotExist:
+            return Response({'error': 'page does not exist!'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # avoid user unfollowing himself
+        if following == request.user:
+            return Response({'error': 'you cannot unfollow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+        # check if this request user is not following the user
+        elif not UserFollower.objects.filter(following=following, follower=request.user).exists():
+            return Response({'error': 'you need to follow this user first!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        else:
+            user_follow = UserFollower.objects.get(following=following, follower=request.user)
+            user_follow.delete()
+            return Response({'unfollowed': True})    
             
