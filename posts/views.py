@@ -207,3 +207,7 @@ class ReplyDetail(APIView):
         reply.delete()
         # if errors
         return Response({"deleted": True})
+
+
+class PostLike(APIView):
+    pass

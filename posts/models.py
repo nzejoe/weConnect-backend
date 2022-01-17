@@ -23,7 +23,6 @@ class Post(models.Model):
     # create thumbnail from avatar
     thumb = ImageSpecField(source='image', processors=[ResizeToFill(
         100, 100), ],  format='JPEG', options={'quality': 60})
-    like_count = models.IntegerField(default=0)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
@@ -65,4 +64,16 @@ class Reply(models.Model):
             return str(f'{self.text[:50]}...')
         else:
             return self.text
+
+
+
+class like(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    created = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        if len(self.post.text) > 50:
+            return str(f'{self.post.text[:50]}...')
+        else:
+            return self.post.text
