@@ -12,6 +12,7 @@ class FollowersInline(admin.StackedInline):
     model = UserFollower
     extra = 0
     fk_name = "follower"
+    readonly_fields = ['follower', 'created']
 
 
 class AccountAdmin(UserAdmin):
@@ -25,5 +26,10 @@ class AccountAdmin(UserAdmin):
     filter_horizontal = ()
     inlines = [FollowersInline, ]
 
+class FollowersAdmin(admin.ModelAdmin):
+    model = UserFollower
+    list_display = ['user', 'follower', 'created'] 
+
 
 admin.site.register(User, AccountAdmin)
+admin.site.register(UserFollower, FollowersAdmin)

@@ -11,7 +11,7 @@ from rest_framework import permissions, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Account
+from .models import Account, UserFollower
 from .serializers import (
     AccountSerializer, 
     UserRegisterSerializer, 
@@ -227,3 +227,17 @@ class PasswordChange(APIView):
             user.set_password(password)
             user.save()
         return Response({'password_changed': True})
+    
+
+
+class FollowUser(APIView):
+    permission_classes = [permissions.IsAuthenticated, ]
+    
+    def post(self, request, pk):
+        # get the user this request user wants to follow
+        following = Account.object.get(pk=pk)
+        
+        # check if this request user already following
+        if UserFollower.objects.filter():
+            pass
+    

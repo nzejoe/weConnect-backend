@@ -1,14 +1,21 @@
 from rest_framework import serializers
 
-from .models import Account
+from .models import Account, UserFollower
+
+
+class FollowersSerializer(serializers.ModelSerializer):
+    follower = serializers.StringRelatedField()
+    class Meta:
+        model = UserFollower
+        fields = '__all__'
 
 
 class AccountSerializer(serializers.ModelSerializer):
-
+    followers = FollowersSerializer(many=True, read_only=True)
     class Meta:
         model = Account
         fields = ['id', 'username', 'first_name', 'last_name',
-                  'email', 'gender', 'avatar']
+                  'email', 'gender', 'avatar', 'followers']
         # exclude = ['password', ]
 
 

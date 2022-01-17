@@ -94,4 +94,4 @@ class UserFollower(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return self.follower
+        return self.follower.username
