@@ -86,3 +86,12 @@ class Account(AbstractBaseUser):
 
     def __str__(self):
         return self.username
+    
+
+class UserFollower(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='followers')
+    follower = models.ForeignKey(Account, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.follower
