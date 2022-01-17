@@ -8,7 +8,7 @@ from . import views
 urlpatterns = [
     path('', views.UserList.as_view(), name='users_list'),
     path('<uuid:pk>/', views.UserDetail.as_view(), name='users_detail'),
-    path('<uuid:pk>/following/', views.UserFollowing.as_view(), name='following'),
+    path('<uuid:pk>/follow/', views.FollowUser.as_view(), name='follow'),
     path('my_details/', views.LoggedInUser.as_view(), name='my_details'),
     path('register/', views.UserRegister.as_view(), name='register'),
     path('password_reset/', views.PasswordReset.as_view(), name='password_reset'),

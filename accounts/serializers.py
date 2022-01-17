@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Account, UserFollower
 
 
-class FollowingSerializer(serializers.ModelSerializer):
+class UserFollowSerializer(serializers.ModelSerializer):
     # this will serialize following user 
     class Meta:
         model = Account
@@ -12,8 +12,14 @@ class FollowingSerializer(serializers.ModelSerializer):
 
 
 class FollowersSerializer(serializers.ModelSerializer):
-    follower = serializers.StringRelatedField()
-    following = FollowingSerializer()
+    follower = UserFollowSerializer()
+    class Meta:
+        model = UserFollower
+        fields = '__all__'
+        
+        
+class FollowingSerializer(serializers.ModelSerializer):
+    following = UserFollowSerializer()
     class Meta:
         model = UserFollower
         fields = '__all__'
@@ -21,10 +27,11 @@ class FollowersSerializer(serializers.ModelSerializer):
 
 class AccountSerializer(serializers.ModelSerializer):
     followers = FollowersSerializer(many=True, read_only=True)
+    following = FollowingSerializer(many=True, read_only=True)
     class Meta:
         model = Account
         fields = ['id', 'username', 'first_name', 'last_name',
-                  'email', 'gender', 'avatar', 'followers']
+                  'email', 'gender', 'avatar', 'followers', 'following']
         # exclude = ['password', ]
 
 

@@ -51,7 +51,11 @@ class UserDetail(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
 
     def get(self, request, pk):
-        user = Account.object.get(pk=pk)
+       # check if pk is valid
+        try:
+            user = Account.object.get(pk=pk)
+        except Account.DoesNotExist:
+            return Response({'error': 'page does not exist!'}, status=status.HTTP_404_NOT_FOUND)
         serializer = AccountSerializer(user)
 
         return Response(serializer.data)
@@ -235,22 +239,24 @@ class FollowUser(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
     
     def post(self, request, pk):
-        # get the user this request user wants to follow
-        following = Account.object.get(pk=pk)
+        # check if pk is valid
+        try:
+            # get the user this request user wants to follow
+            following = Account.object.get(pk=pk)
+        except Account.DoesNotExist:
+            return Response({'error': 'page does not exist!'}, status=status.HTTP_404_NOT_FOUND)
         
         # check if this request user already following
-        if UserFollower.objects.filter():
-            pass
-
-
-class UserFollowing(APIView):
-    # this view will return list of user any user is following
-    permission_classes = [permissions.IsAuthenticated, ]
-    
-    def get(self, request, pk):
-        # if request is made by logged in user
-        user = Account.object.get(pk=pk)
-        users_following = UserFollower.objects.filter(follower=user)
-        serializer = FollowersSerializer(users_following, many=True)
-        return Response(serializer.data)
+        if UserFollower.objects.filter(following=following, follower=request.user).exists():
+            return Response({'error': 'you are already following this user'}, status=status.HTTP_400_BAD_REQUEST)
+        # avoid user following himself
+        elif following == request.user:
+            return Response({'error': 'you cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            user_follow = UserFollower(
+                following=following,
+                follower=request.user
+            )
+            user_follow.save()
+            return Response({'followed': True})
             

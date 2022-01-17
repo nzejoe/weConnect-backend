@@ -90,7 +90,7 @@ class Account(AbstractBaseUser):
 
 class UserFollower(models.Model):
     following = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='followers')
-    follower = models.ForeignKey(Account, on_delete=models.CASCADE)
+    follower = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='following')
     created = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
