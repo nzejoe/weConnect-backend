@@ -1,6 +1,4 @@
 from django.urls import path
-from django.conf import settings
-from django.conf.urls.static import static
 
 from . import views
 
@@ -10,6 +8,7 @@ urlpatterns = [
     path('<uuid:pk>/', views.UserDetail.as_view(), name='users_detail'),
     path('<uuid:pk>/follow/', views.FollowUser.as_view(), name='follow'),
     path('my_details/', views.LoggedInUser.as_view(), name='my_details'),
+    path('my_details/update/', views.LoggedInUser.as_view(), name='update'),
     path('register/', views.UserRegister.as_view(), name='register'),
     path('password_reset/', views.PasswordReset.as_view(), name='password_reset'),
     path('password_reset_verification/<uidb64>/<token>/', views.PasswordResetVerification.as_view(), name='password_reset_verification'),
@@ -17,7 +16,3 @@ urlpatterns = [
     path('password_change/', views.PasswordChange.as_view(), name='password_change'),
     path('activate_user/<uidb64>/<token>/', views.UserActivation.as_view(), name='activate_user'),
 ]
-
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

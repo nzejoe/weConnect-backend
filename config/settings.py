@@ -160,7 +160,7 @@ AUTH_USER_MODEL = 'accounts.Account'
 # REST FRAME WORK
 
 # corsheaders configs
-CORS_ALLOWED_ORIGINS = []
+CORS_ALLOWED_ORIGINS = ['http://localhost:3000', ]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

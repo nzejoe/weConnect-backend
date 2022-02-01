@@ -11,7 +11,7 @@ User = get_user_model()
 class FollowersInline(admin.StackedInline):
     model = UserFollower
     extra = 0
-    fk_name = "follower"
+    fk_name = "following"
     readonly_fields = ['follower', 'created']
 
 

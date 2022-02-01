@@ -43,10 +43,18 @@ class LoggedInUser(APIView):
         serializer = AccountSerializer(user)
 
         return Response(serializer.data)
-
+    
+    def put(self, request):
+       user = Account.object.get(pk=request.user.id)
+       serializer = AccountSerializer(user, data=request.data)
+       if serializer.is_valid(raise_exception=True):
+           serializer.save()
+           return Response(serializer.data)
+       else:
+           return Response(serializer.errors)
 
 class UserDetail(APIView):
-    ''' this view will return the details any user '''
+    ''' this view will return the details of any user '''
     # user must be authenticated in order to access this view
     permission_classes = [permissions.IsAuthenticated, ]
 
