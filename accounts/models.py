@@ -61,7 +61,7 @@ class Account(AbstractBaseUser):
     email = models.EmailField(unique=True)
     gender = models.CharField(max_length=10, choices=GENDER)
     avatar = ProcessedImageField(
-        upload_to='users/', processors=[ResizeToFill(500, 500), ], format='JPEG', options={'quality': 60}, null=True, blank=True)
+        upload_to='users/', processors=[ResizeToFill(500, 500), ], format='JPEG', options={'quality': 60}, default='users/default.jpg', null=True, blank=True)
     # create thumbnail from avatar
     thumb = ImageSpecField(source='avatar', processors=[ResizeToFill(
         100, 100), ],  format='JPEG', options={'quality': 60})

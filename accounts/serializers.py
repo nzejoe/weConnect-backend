@@ -30,9 +30,10 @@ class AccountSerializer(serializers.ModelSerializer):
     following = FollowingSerializer(many=True, read_only=True)
     class Meta:
         model = Account
-        fields = ['id', 'username', 'first_name', 'last_name',
-                  'email', 'gender', 'avatar', 'followers', 'following']
-        # exclude = ['password', ]
+        # fields = '__all__'
+        # fields = ['id', 'username', 'first_name', 'last_name',
+        #           'email', 'gender', 'avatar', 'followers', 'following']
+        exclude = ['password', ]
     
     def update(self, instance, validated_data):
         instance.username = validated_data.get('username', instance.username)
