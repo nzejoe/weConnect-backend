@@ -12,10 +12,10 @@ from .permissions import IsOwnerOrReadOnly
 
 
 class PostList(APIView):
-    # permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated, ]
 
     def get(self, request):
-        post_list = Post.objects.all()
+        post_list = Post.objects.filter(author=request.user)
         serializer = PostSerializer(post_list, many=True)
         return Response(serializer.data)
 

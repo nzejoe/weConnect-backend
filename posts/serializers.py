@@ -55,7 +55,7 @@ class PostAuthorSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     author = PostAuthorSerializer(read_only=True)
-    likes = LikeSerializer(many=True)
+    likes = LikeSerializer(many=True, read_only=True)
     class Meta:
         model = Post
         fields = '__all__'
