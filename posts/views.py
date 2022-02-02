@@ -1,5 +1,5 @@
-from webbrowser import get
 from django.shortcuts import render
+from django.db.models import Q
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,7 +15,11 @@ class PostList(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
 
     def get(self, request):
-        post_list = Post.objects.filter(author=request.user)
+        user = request.user
+        # get user's followers
+        followers = user.followers.all().values_list('follower', flat=True)
+        # get all posts by user and his followers
+        post_list = Post.objects.filter(Q(author=request.user) | Q(author__in=followers)).order_by('-created')
         serializer = PostSerializer(post_list, many=True)
         return Response(serializer.data)
 
