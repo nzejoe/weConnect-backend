@@ -12,7 +12,7 @@ from .permissions import IsOwnerOrReadOnly
 
 
 class PostList(APIView):
-    permission_classes = [permissions.IsAuthenticated, ]
+    # permission_classes = [permissions.IsAuthenticated, ]
 
     def get(self, request):
         post_list = Post.objects.all()

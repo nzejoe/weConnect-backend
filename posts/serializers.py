@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from accounts.models import Account
 from .models import Like, Post, Comment, Reply
 
 
@@ -45,10 +46,15 @@ class LikeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PostAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        exclude = ['password',]
+
 
 class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
-    author = serializers.StringRelatedField(read_only=True)
+    author = PostAuthorSerializer(read_only=True)
     likes = LikeSerializer(many=True)
     class Meta:
         model = Post
