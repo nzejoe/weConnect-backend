@@ -53,7 +53,7 @@ class PostDetail(APIView):
         serializer = PostSerializer(post, context={'request': request})
         return Response(serializer.data)
 
-    def put(self, request, pk):
+    def put(self, request, pk, format=None):
         # get the post we want to update
         try:
             post = Post.objects.get(id=pk)
