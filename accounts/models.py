@@ -87,6 +87,10 @@ class Account(AbstractBaseUser):
     def __str__(self):
         return self.username
     
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+    
 
 class UserFollower(models.Model):
     following = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='followers')

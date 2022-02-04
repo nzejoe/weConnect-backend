@@ -5,9 +5,14 @@ from .models import Like, Post, Comment, Reply
 
 
 class AuthorSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField(method_name='get_full_name')
     class Meta:
         model = Account
         exclude = ['password', ]
+        
+    
+    def get_full_name(self, obj):
+        return obj.full_name
 
 
 class ReplySerializer(serializers.ModelSerializer):
