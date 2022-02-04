@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializers import PostSerializer, CommentSerializer, ReplySerializer
 from .models import Post, Comment, Reply, Like, User
@@ -13,6 +14,7 @@ from .permissions import IsOwnerOrReadOnly
 
 class PostList(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         user = request.user
@@ -23,19 +25,23 @@ class PostList(APIView):
         serializer = PostSerializer(post_list, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
+    def post(self, request, format=None):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
-            data = {'author': request.user, **serializer.data}
-            post = Post.objects.create(**data)
+            data = serializer.validated_data
+            post = Post()
+            post.author = request.user
+            post.text = data.get('text')
+            post.image = data.get('image')
             post.save()
-            return Response({'author': request.user.id, **serializer.data})
+            return Response(serializer.data)
         else:
             return Response(serializer.errors)
 
 
 class PostDetail(APIView):
     permission_classes = (IsOwnerOrReadOnly, )
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, pk):
         try:
