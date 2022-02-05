@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render
 from django.db.models import Q
 
@@ -53,10 +55,24 @@ class PostDetail(APIView):
         serializer = PostSerializer(post, context={'request': request})
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request, pk, format=None): 
         # get the post we want to update
         try:
             post = Post.objects.get(id=pk)
+            
+            # check if image has been cleared
+            # clear_image is extra attribute from frontend to alert the
+            # the backend to remove image for this post
+            if request.data.get('clear_image'): 
+                # if so remove image for thais post from database
+                post.image.delete(save=True)
+            
+            # check if post already has an image
+            # if so, that means image is been changed
+            if post.image and request.data.get('image'):
+                # remove the old image from storage
+                os.remove(post.image.path)
+                
         except Post.DoesNotExist:
             return Response({'error': 'post you are looking for does not exist!'}, status=status.HTTP_404_NOT_FOUND)
         # check if user has permission for this request
