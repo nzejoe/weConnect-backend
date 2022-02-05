@@ -20,10 +20,10 @@ class PostList(APIView):
 
     def get(self, request):
         user = request.user
-        # get user's followers
-        followers = user.followers.all().values_list('follower', flat=True)
+        # get post of users who logged in user is following  
+        following = user.followers.all().values_list('follower', flat=True)
         # get all posts by user and his followers
-        post_list = Post.objects.filter(Q(author=request.user) | Q(author__in=followers)).order_by('-created')
+        post_list = Post.objects.filter(Q(author=request.user) | Q(author__in=following)).order_by('-created')
         serializer = PostSerializer(post_list, many=True)
         return Response(serializer.data)
 
@@ -91,6 +91,7 @@ class PostDetail(APIView):
             # if no post matches the pk
             # return error response
             return Response({'error': "post does not exist!"}, status=status.HTTP_404_NOT_FOUND)
+        
         # delete post
         # make sure to delete image as well from storage
         if post.image:
