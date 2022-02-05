@@ -93,10 +93,11 @@ class PostDetail(APIView):
             return Response({'error': "post does not exist!"}, status=status.HTTP_404_NOT_FOUND)
         # delete post
         # make sure to delete image as well from storage
-        # get the image path from the storage
-        post_image_path = post.image.path
-        # remove image from storage
-        os.remove(post_image_path)
+        if post.image:
+            # get the image path from the storage
+            post_image_path = post.image.path
+            # remove image from storage
+            os.remove(post_image_path)
         post.delete()
         # check if user has permission for this request
         self.check_object_permissions(request, post)
