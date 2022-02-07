@@ -28,6 +28,7 @@ class FollowingSerializer(serializers.ModelSerializer):
 class AccountSerializer(serializers.ModelSerializer):
     followers = FollowersSerializer(many=True, read_only=True)
     following = FollowingSerializer(many=True, read_only=True)
+    full_name = serializers.SerializerMethodField(method_name='get_full_name')
     class Meta:
         model = Account
         # fields = '__all__'
@@ -44,6 +45,9 @@ class AccountSerializer(serializers.ModelSerializer):
         instance.avatar = validated_data.get('avatar', instance.avatar)
         instance.save()
         return super().update(instance, validated_data)
+    
+    def get_full_name(self, data):
+        return data.full_name
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):

@@ -98,7 +98,7 @@ class UserRegister(APIView):
             # get the address of the site making request
             current_site = request.META.get(
                 'HTTP_ORIGIN') or get_current_site(request)
-            activation_url = f'{current_site}/users/activate_user/{uid}/{token}/'
+            activation_url = f'{current_site}/account/activate_user/{uid}/{token}/'
 
             # create email message
             context = {
