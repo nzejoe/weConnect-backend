@@ -154,7 +154,7 @@ class PasswordReset(APIView):
             uid = urlsafe_base64_encode(force_bytes(user.id))
             token = default_token_generator.make_token(user=user)
             current_site = request.META.get('HTTP_ORIGIN') or get_current_site(request)
-            verification_url = f'{current_site}/users/password_reset_verification/{uid}/{token}/'
+            verification_url = f'{current_site}/account/password_reset_verification/{uid}/{token}/'
             
             # create email message
             context = {
