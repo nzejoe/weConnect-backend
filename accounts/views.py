@@ -246,7 +246,7 @@ class PasswordChange(APIView):
             password = serializer.validated_data.get('password')
             # check if current password is correct
             if not user.check_password(current_password):
-                raise serializers.ValidationError({'current_password':'current password is incorrect!'})
+                raise serializers.ValidationError({'current_password':'Current password is incorrect!'})
             user.set_password(password)
             user.save()
         return Response({'password_changed': True})
