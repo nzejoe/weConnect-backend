@@ -31,10 +31,21 @@ class AccountSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField(method_name='get_full_name')
     class Meta:
         model = Account
-        # fields = '__all__'
-        # fields = ['id', 'username', 'first_name', 'last_name',
-        #           'email', 'gender', 'avatar', 'followers', 'following']
         exclude = ['password', ]
+        extra_kwargs = {
+            'is_active': {
+                'read_only': True,
+            },
+            'is_staff': {
+                'read_only': True,
+            },
+            'is_admin': {
+                'read_only': True,
+            },
+            'is_superuser': {
+                'read_only': True,
+            },
+        }
     
     def update(self, instance, validated_data):
         instance.username = validated_data.get('username', instance.username)
@@ -43,7 +54,6 @@ class AccountSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.gender = validated_data.get('gender', instance.gender)
         instance.avatar = validated_data.get('avatar', instance.avatar)
-        instance.save()
         return super().update(instance, validated_data)
     
     def get_full_name(self, data):

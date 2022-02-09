@@ -1,3 +1,5 @@
+import os
+
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.contrib.sites.shortcuts import get_current_site
@@ -10,6 +12,7 @@ from django.core.mail import EmailMessage
 from rest_framework import permissions, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import Account, UserFollower
 from .serializers import (
@@ -37,6 +40,7 @@ class LoggedInUser(APIView):
     ''' this view will return the details of logged in user '''
     # user must be authenticated in order to access this view
     permission_classes = [permissions.IsAuthenticated, ]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         user = Account.object.get(pk=request.user.id)
@@ -45,13 +49,19 @@ class LoggedInUser(APIView):
         return Response(serializer.data)
     
     def put(self, request):
-       user = Account.object.get(pk=request.user.id)
-       serializer = AccountSerializer(user, data=request.data)
-       if serializer.is_valid(raise_exception=True):
-           serializer.save()
-           return Response(serializer.data)
-       else:
-           return Response(serializer.errors)
+        user = Account.object.get(pk=request.user.id)    
+        serializer = AccountSerializer(user, data=request.data)
+       
+        if serializer.is_valid(raise_exception=True):
+            
+            if user.avatar and request.data.get('avatar'):
+                # remove old avatar from media storage
+                os.remove(user.avatar.path)
+
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors)
 
 class UserDetail(APIView):
     ''' this view will return the details of any user '''
