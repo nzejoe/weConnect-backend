@@ -30,7 +30,7 @@ class UserList(APIView):
     permission_classes = [permissions.IsAuthenticated, ]
 
     def get(self, request):
-        user_list = Account.object.all()
+        user_list = Account.object.filter().exclude(pk=request.user.id)
         serializer = AccountSerializer(user_list, many=True)
 
         return Response(serializer.data)
