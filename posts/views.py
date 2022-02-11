@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 
+from accounts.models import Account
 from .serializers import PostSerializer, CommentSerializer, ReplySerializer
 from .models import Post, Comment, Reply, Like, User
 from .permissions import IsOwnerOrReadOnly
@@ -39,6 +40,18 @@ class PostList(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors)
+
+class ProfilePostList(APIView):
+    # permission_classes = [permissions.IsAuthenticated, ]
+    
+    def get(self, request, username):
+        try:
+            user = Account.object.get(username=username)
+        except(Account.DoesNotExist):
+            return Response({'error': 'invalid user!'}, status=status.HTTP_404_NOT_FOUND)
+        post_list = Post.objects.filter(Q(author=user)).order_by('-created')
+        serializer = PostSerializer(post_list, many=True)
+        return Response(serializer.data)
 
 
 class PostDetail(APIView):
