@@ -42,7 +42,7 @@ class PostList(APIView):
             return Response(serializer.errors)
 
 class ProfilePostList(APIView):
-    # permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.IsAuthenticated, ]
     
     def get(self, request, username):
         try:

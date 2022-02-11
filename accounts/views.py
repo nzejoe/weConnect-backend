@@ -68,10 +68,10 @@ class UserDetail(APIView):
     # user must be authenticated in order to access this view
     permission_classes = [permissions.IsAuthenticated, ]
 
-    def get(self, request, pk):
+    def get(self, request, username):
        # check if pk is valid
         try:
-            user = Account.object.get(pk=pk)
+            user = Account.object.get(username=username)
         except Account.DoesNotExist:
             return Response({'error': 'page does not exist!'}, status=status.HTTP_404_NOT_FOUND)
         serializer = AccountSerializer(user)
