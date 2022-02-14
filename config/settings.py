@@ -36,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     # LOCAL APPS
     'accounts',
     'posts',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -180,3 +182,6 @@ AUTHENTICATION_BACKENDS = (
 
 # set email backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# CHANNELS CONFIG
+ASGI_APPLICATION = 'config.asgi.application'
