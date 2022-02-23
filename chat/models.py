@@ -1,4 +1,3 @@
-from pyexpat import model
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth import get_user_model
@@ -8,23 +7,26 @@ User = get_user_model()
 
 class RoomManager(models.Manager):
     def get_or_new(self, user, other_user):
-        username = user.username
-        room_lookup1 = Q(first_user__username=username) & Q(first_user__username=other_user)
-        room_lookup2 = Q(first_user__username=other_user) & Q(first_user__username=username)
-        rooms = self.get_queryset().filter(room_lookup1 | room_lookup2).distinct()
         
+        UserClass = user.__class__
+        user2 = None
+        try:
+            user2 = UserClass.object.get(username=other_user)
+        except(AttributeError, UserClass.DoesNotExist):
+            return None
+        
+        room_lookup1 = Q(first_user=user) & Q(second_user=other_user)
+        room_lookup2 = Q(second_user=user2) & Q(first_user=user)
+        rooms = self.get_queryset().filter(room_lookup2)
         if rooms.exists():
             return rooms.first()
         else:
-            UserClass = user.__class__
-            user2 = UserClass.object.get(username=other_user)
-            
             obj = self.model(
                 first_user=user,
                 second_user=user2
             )
             obj.save()
-            return obj
+            return None
 
 
 class Room(models.Model):
@@ -36,7 +38,10 @@ class Room(models.Model):
     
     @property
     def room_name(self):
-        return f'chat_{self.room_id}'
+        return f'chat_{self.id}'
+    
+    def __str__(self):
+        return f'room_{self.first_user}_{self.second_user}'
     
 
 class ChatMessage(models.Model):

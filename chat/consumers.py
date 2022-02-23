@@ -4,20 +4,20 @@ from channels.db import database_sync_to_async
 
 from chat.models import Room
 
-
 class ChatConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
-        other_user = self.scope['url_route']['kwargs']['username']
         me = self.scope['user']
+        other_user = self.scope['url_route']['kwargs']['username']
         
-        print()
-        print(me.__class__)
-        print()
-        
-        # room = await self.get_room()
+        room = await self.get_room(me, other_user)
+        if not room:
+            await self.close()
+        else:
+            room_name = room.room_name
+            print()
        
-        await self.accept()
+            await self.accept()
         
     async def receive(self, text_data):
         message = text_data
@@ -25,6 +25,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({'message': message}))
     
     @database_sync_to_async
-    def get_room(self, me, otherUser):
-        return Room.objects.get_or_new(me, otherUser)
-    
+    def get_room(self, me, other_user):
+        return Room.objects.get_or_new(me, other_user)
