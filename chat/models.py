@@ -30,6 +30,10 @@ class Room(models.Model):
     
     objects = RoomManager()
     
+    @property
+    def room_name(self):
+        return f'chat_{self.room_id}'
+    
 
 class ChatMessage(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
