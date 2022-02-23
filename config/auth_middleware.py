@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
+from django.forms import ValidationError
 
 from channels.auth import AuthMiddlewareStack
 from channels.db import database_sync_to_async
@@ -11,7 +12,7 @@ from accounts.models import Account
 def get_user(user_id):
     try:
         return Account.object.get(id=user_id)
-    except Account.DoesNotExist:
+    except (Account.DoesNotExist, ValidationError):
         return AnonymousUser()
 
 
