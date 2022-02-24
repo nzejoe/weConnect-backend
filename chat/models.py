@@ -15,9 +15,10 @@ class RoomManager(models.Manager):
         except(AttributeError, UserClass.DoesNotExist):
             return None
         
-        room_lookup1 = Q(first_user=user) & Q(second_user=other_user)
-        room_lookup2 = Q(second_user=user2) & Q(first_user=user)
-        rooms = self.get_queryset().filter(room_lookup2)
+        room_lookup1 = Q(first_user=user) & Q(second_user=user2)
+        room_lookup2 = Q(first_user=user2) & Q(second_user=user)
+        rooms = self.get_queryset().filter(room_lookup1 | room_lookup2)
+        
         if rooms.exists():
             return rooms.first()
         else:

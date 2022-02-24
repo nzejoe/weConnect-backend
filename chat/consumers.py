@@ -11,13 +11,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         other_user = self.scope['url_route']['kwargs']['username']
         
         room = await self.get_room(me, other_user)
+        self.room_name = None
         if not room:
             await self.close()
         else:
-            room_name = room.room_name
-            print()
-       
+            self.room_name = room.room_name
             await self.accept()
+        # print(self.room_name)
         
     async def receive(self, text_data):
         message = text_data
