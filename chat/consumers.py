@@ -3,14 +3,15 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
 from chat.models import Room
+from accounts.serializers import ChatUserSerializer
 
 class ChatConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
-        me = self.scope['user']
-        other_user = self.scope['url_route']['kwargs']['username']
+        self.me = self.scope['user']
+        self.other_user = self.scope['url_route']['kwargs']['username']
         
-        room = await self.get_room(me, other_user)
+        room = await self.get_room()
         self.room_name = None
         if not room:
             await self.close()
@@ -20,10 +21,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # print(self.room_name)
         
     async def receive(self, text_data):
-        message = text_data
-        
+        message = {}
+        message = json.loads(text_data)
+        user_serializer = ChatUserSerializer(self.me)
+        message['user'] = user_serializer.data
+        print()
+        print(message)
+        print()
         await self.send(json.dumps({'message': message}))
     
     @database_sync_to_async
-    def get_room(self, me, other_user):
-        return Room.objects.get_or_new(me, other_user)
+    def get_room(self):
+        return Room.objects.get_or_new(self.me, self.other_user)

@@ -116,3 +116,8 @@ class PasswordChangeSerializer(serializers.Serializer):
         if password != password2:
             raise serializers.ValidationError({'error': 'the new password did not match!'})
         return super().validate(attrs)
+
+class ChatUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Account
+        fields = ['username', 'avatar']
