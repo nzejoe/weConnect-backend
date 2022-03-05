@@ -5,31 +5,60 @@ from django.db.models import Q
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework import permissions
+from rest_framework import permissions, status, pagination, generics
 from rest_framework.parsers import MultiPartParser, FormParser
 
 from accounts.models import Account
 from .serializers import PostSerializer, CommentSerializer, ReplySerializer
-from .models import Post, Comment, Reply, Like, User
+from .models import Post, Comment, Reply, Like
 from .permissions import IsOwnerOrReadOnly
+from .pagination import PostPagination
 
 
-class PostList(APIView):
+# class PostList(APIView, pagination.CursorPagination):
+#     permission_classes = [permissions.IsAuthenticated, ]
+#     parser_classes = [MultiPartParser, FormParser]
+
+#     def get(self, request):
+#         user = request.user
+#         # get post of users who logged in user is following  
+#         following = user.followers.all().values_list('follower', flat=True)
+#         # get all posts by user and his followers
+#         post_list = Post.objects.filter(Q(author=request.user) | Q(author__in=following)).order_by('-created')
+#         serializer = PostSerializer(post_list, many=True)
+#         return Response(serializer.data)
+
+#     def post(self, request, format=None):
+#         serializer = PostSerializer(data=request.data)
+#         if serializer.is_valid():
+#             data = serializer.validated_data
+#             post = Post()
+#             post.author = request.user
+#             post.text = data.get('text')
+#             post.image = data.get('image')
+#             post.save()
+#             return Response(serializer.data)
+#         else:
+#             return Response(serializer.errors)
+        
+class PostList(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated, ]
     parser_classes = [MultiPartParser, FormParser]
+    pagination_class = PostPagination
 
-    def get(self, request):
-        user = request.user
+    def get_queryset(self):
+        user = self.request.user
         # get post of users who logged in user is following  
         following = user.followers.all().values_list('follower', flat=True)
-        # get all posts by user and his followers
-        post_list = Post.objects.filter(Q(author=request.user) | Q(author__in=following)).order_by('-created')
-        serializer = PostSerializer(post_list, many=True)
-        return Response(serializer.data)
-
+        # # get all posts by user and his followers
+        # #| Q(author__in=following)
+        queryset = Post.objects.filter(Q(author=user) | Q(author__in=following)).order_by('-created')
+        return queryset
+    
     def post(self, request, format=None):
-        serializer = PostSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             data = serializer.validated_data
             post = Post()

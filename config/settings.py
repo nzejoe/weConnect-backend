@@ -185,3 +185,19 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # CHANNELS CONFIG
 ASGI_APPLICATION = 'config.asgi.application'
+
+if DEBUG:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer"
+        }
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("localhost", 6379)],
+            },
+        },
+    }
